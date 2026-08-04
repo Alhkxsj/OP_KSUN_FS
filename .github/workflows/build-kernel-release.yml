@@ -33,18 +33,25 @@ on:
           - OP-ACE-6-ULTRA
           - OP-ACE-6T
           - OP-ACE-RACE
+          - OP-N6
           - OP-NORD-3
           - OP-NORD-4
           - OP-NORD-4-CE
           - OP-NORD-5
+          - OP-NORD-6
           - OP-NORD-CE-5
           - OP-NORD-CE4-LITE
+          - OP-NORD-CE6-LITE
+          - OP-NORD-N30-SE
           - OP-OPEN
           - OP-PAD-2-MT6991
           - OP-PAD-2-PRO
           - OP-PAD-2-SM8650
           - OP-PAD-3-MT6897
+          - OP-PAD-3-PRO
           - OP-PAD-3-SM8750
+          - OP-PAD-4
+          - OP-PAD-GO
           - OP-PAD-GO-2
           - OP-PAD-LITE
           - OP-PAD-MT6983
@@ -67,6 +74,7 @@ on:
           - OP15T
           - OP-TURBO-6
           - OP-TURBO-6V
+          - OP-TURBO-6X
         default: All
       android_version_filter:
         description: 'Select the Android Version to build'
@@ -162,23 +170,23 @@ on:
       android12-5_10_susfs_branch_or_commit:
         description: 'Enter SusFS Branch or commit hash for android12-5.10'
         type: string
-        default: '4003ecf2d01c6d13fa8edf6c4f2607365738dc3d'      
+        default: 'be08face56c347e7ba9c4fb420c2463598a14f5d'      
       android13-5_15_susfs_branch_or_commit:
         description: 'Enter SusFS Branch or commit hash for android13-5.15'
         type: string
-        default: '65ea8683c794cc309c3b0c4e6b57c1d972ca9a76'      
+        default: 'e29e344398995898a3b2f2a00f8979e2a599ba96'      
       android14-6_1_susfs_branch_or_commit:
         description: 'Enter SusFS Branch or commit hash for android14-6.1'
         type: string
-        default: '52eaf3b8fa50207af2ce4f78d73729dc9e1303ea'
+        default: 'a74b1ebdfe62a0aa3809bb01d440d6ae01fdf126'
       android15-6_6_susfs_branch_or_commit:
         description: 'Enter SusFS Branch or commit hash for android15-6.6'
         type: string
-        default: 'a8c720c42ca46fca13179280b13aa13c9fbe1562'
+        default: 'd4f50f6d7cfa21fef497c48cdeffa3b50952bf56'
       android16-6_12_susfs_branch_or_commit:
         description: 'Enter SusFS Branch or commit hash for android16-6.12'
         type: string
-        default: '72bdce7ce2de8189efb227c6cefbc578a9efd479'
+        default: 'd9a486dc7197800149c31fe35a77997ea0ddaa83'
 
 jobs:
   set-op-model:
@@ -245,7 +253,7 @@ jobs:
               ;;
             *)
               echo "ℹ️  Device-specific filter applied: $input"
-              jq_filter="map(select(.model == \"$input\"))"
+              jq_filter="map(select(.model == \"$input\" or (.model | startswith(\"$input-\"))))"
               ;;
           esac
           
