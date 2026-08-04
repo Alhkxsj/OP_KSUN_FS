@@ -8,7 +8,6 @@
   </tr>
 </table>
 
- - Currently All the kernels are built from Android 15 Manifest.
  - Do not use the zips after Major Android OTA (a15 -> a16) unless its verified in <a href="https://t.me/WildKernels">WildKernels</a> Telegram group or other sources like XDA.
 
 ## 2. Non-OnePlus Devices
@@ -64,5 +63,10 @@
 		<td align="center"> MI 12T Pro </td>
 		<td align="center"> OnePlus 10T</td>
 		<td align="center"> android12-5.10.226<br>android12-5.10.236</td>
+	</tr>
+	<tr> 
+		<td align="center"> Realme GT5 Pro </td>
+		<td align="center"> OnePlus 12 </td>
+		<td align="center"> android14-6.1.118 </td>
 	</tr>
 </table>
