@@ -318,7 +318,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libelf-dev libdwarf-dev dwarves binutils-dev build-essential bc bison flex pkg-config
+        sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libelf-dev libdwarf-dev dwarves binutils-dev build-essential bc bison flex pkg-config dos2unix
         CONFIG="$OP_MODEL"
         echo "Creating folder for configuration: $CONFIG"
         mkdir -p "$CONFIG"
@@ -1311,6 +1311,18 @@ runs:
       run: |
         set -euo pipefail
         echo "::group::Apply Other patches"
+        
+        ensure_unix() {
+          for f in "$@"; do
+            if command -v dos2unix >/dev/null 2>&1; then
+              dos2unix "$f"
+            else
+              echo "ℹ️  dos2unix not found, falling back to sed for $f"
+              sed -i 's/\r$//' "$f"
+            fi
+          done
+        }
+        
         cd "$COMMON_KERNEL_FOLDER"
         KERNEL_VERSION="${{ env.KERNEL_VER }}"
         MIN_VERSION="5.16"
@@ -1330,12 +1342,12 @@ runs:
             *)
               FENGCHI_DIR="$KERNEL_PATCHES_FOLDER/oneplus/hmbird" ;;
           esac
-          dos2unix "$FENGCHI_DIR/fengchi_${HMBIRD_MODEL}_${OP_OS_VERSION}.patch"
+          ensure_unix "$FENGCHI_DIR/fengchi_${HMBIRD_MODEL}_${OP_OS_VERSION}.patch"
           patch -p1 -F 3 < "$FENGCHI_DIR/fengchi_${HMBIRD_MODEL}_${OP_OS_VERSION}.patch"
-          dos2unix "$KERNEL_PATCHES_FOLDER/oneplus/hmbird/overwriter.patch"
+          ensure_unix "$KERNEL_PATCHES_FOLDER/oneplus/hmbird/overwriter.patch"
           patch -p1 -F 3 < "$KERNEL_PATCHES_FOLDER/oneplus/hmbird/overwriter.patch"
           chmod +x ./drivers/of/overwriter/overwrite_configs/convert_configs.sh
-          dos2unix "$KERNEL_PATCHES_FOLDER/oneplus/hmbird/hmbird_config.patch"
+          ensure_unix "$KERNEL_PATCHES_FOLDER/oneplus/hmbird/hmbird_config.patch"
           patch -p1 -F 3 < "$KERNEL_PATCHES_FOLDER/oneplus/hmbird/hmbird_config.patch"
         else
           echo "Hmbird not enabled, skipping fengchi patch"
