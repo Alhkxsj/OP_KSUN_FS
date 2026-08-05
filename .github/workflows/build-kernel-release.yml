@@ -311,8 +311,8 @@ jobs:
           echo "$filtered" | jq '.' > matrix.json
           
           # For each device + each ksu option → one combined entry
-          merged_matrix=$(jq -n --argjson devices "$filtered" --argjson ksu_list "$ksu_options_normalized" \
-            '[ $devices[] as $dev | $ksu_list[] as $ksu | ($dev + {ksu_type: $ksu.type, ksu_hash: $ksu.hash}) ]')
+          merged_matrix=$(jq -n --slurpfile devices matrix.json --argjson ksu_list "$ksu_options_normalized" \
+            '[ $devices[0][] as $dev | $ksu_list[] as $ksu | ($dev + {ksu_type: $ksu.type, ksu_hash: $ksu.hash}) ]')
           
           # Sort matrix by OOS version (A16 -> A15 -> A14)
           merged_matrix=$(echo "$merged_matrix" | jq -c 'sort_by(.os_version) | reverse')
@@ -553,8 +553,8 @@ jobs:
           echo "matrix_A14=$matrix_A14" >> "$GITHUB_OUTPUT"
           
           # Maintain compatibility for existing job
-          wrapped=$(jq -n --argjson items "$merged_matrix" '{ include: $items }')
-          echo "matrix=$(jq -c . <<< "$wrapped")" >> "$GITHUB_OUTPUT"
+          wrapped=$(jq -c '{ include: . }' <<< "$merged_matrix")
+          echo "matrix=$wrapped" >> "$GITHUB_OUTPUT"
           
           ksu_type=$(echo "$ksu_options_normalized" | jq -r '.[0].type')
           ksu_ref=$(echo "$ksu_options_normalized" | jq -r '.[0].hash')
@@ -712,8 +712,8 @@ jobs:
             '[.[] | . + {susfs_resolved_hash: ($hashes["\(.android_version)-\(.kernel_version)"] // "unknown")}]')
           
           # Recalculate wrapped with updated matrix and write output
-          wrapped=$(jq -n --argjson items "$merged_matrix" '{ include: $items }')
-          echo "matrix=$(jq -c . <<< "$wrapped")" >> "$GITHUB_OUTPUT"
+          wrapped=$(jq -c '{ include: . }' <<< "$merged_matrix")
+          echo "matrix=$wrapped" >> "$GITHUB_OUTPUT"
           
           echo "::endgroup::"
 
