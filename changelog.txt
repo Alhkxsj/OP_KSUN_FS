@@ -1,4 +1,4 @@
-🚀 Add OnePlus N6 Support [New Device] 
+🚀🚀 Add OnePlus N6 Support [New Device] 
 🚀 Add OnePlus 13 6.6.118 Support 
 🚀 Add OnePlus 13T 6.6.118 Support 
 🚀 Add OnePlus Ace 5 Pro 6.6.118 Support 
@@ -17,3 +17,4 @@
 🚀 fix(action): upgrade download-artifact to v8 and enforce skip-decompress: true
 🚀 Updated KSUN to 33227
 🚀 Updated SUSFS to latest commits
+🚀 7a5c415 (fix(ci): solve Argument list too long error on matrix generation jq calls)

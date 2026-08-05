@@ -1031,8 +1031,12 @@ runs:
             if [ "${{ inputs.ksu_type }}" = "KSUN" ]; then
               cd "$KSUN_FOLDER"
               patch -p1 --forward < "$SUSFS_FOLDER/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" || true
-              for file in $(find ./kernel -maxdepth 2 -name "*.rej" -printf "%f\n" | cut -d'.' -f1); do
+              mapfile -t rej_files < <(find ./kernel -maxdepth 2 -name "*.rej")
+              for rej_file in "${rej_files[@]}"; do
+                [ -f "$rej_file" ] || continue
+                file=$(basename "$rej_file" .c.rej)
                 echo "Patching file: $file.c with fix_$file.c.patch"
+                rm -f "$rej_file"
                 patch -p1 --forward < "$KERNEL_PATCHES_FOLDER/next/susfs_fix_patches/$susfs_version/fix_$file.c.patch"
               done
               patch -p1 --forward < "$KERNEL_PATCHES_FOLDER/next/susfs_fix_patches/$susfs_version/fix_kernel_compat.c.patch"
@@ -1045,8 +1049,12 @@ runs:
             if [ "${{ inputs.ksu_type }}" = "KSUN" ]; then
               cd "$KSUN_FOLDER"
               patch -p1 --forward < "$SUSFS_FOLDER/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" || true
-              for file in $(find ./kernel -maxdepth 2 -name "*.rej" -exec basename {} .rej \;); do
+              mapfile -t rej_files < <(find ./kernel -maxdepth 2 -name "*.rej")
+              for rej_file in "${rej_files[@]}"; do
+                [ -f "$rej_file" ] || continue
+                file=$(basename "$rej_file" .rej)
                 echo "Patching file: $file with fix_$file.patch"
+                rm -f "$rej_file"
                 patch -p1 --forward < "$KERNEL_PATCHES_FOLDER/next/susfs_fix_patches/$susfs_version/fix_$file.patch"
               done
               echo "Patching Hook Mode!"
@@ -1070,8 +1078,12 @@ runs:
             if [ "${{ inputs.ksu_type }}" = "KSUN" ]; then
               cd "$KSUN_FOLDER"
               patch -p1 --forward < "$SUSFS_FOLDER/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" || true
-              for file in $(find ./kernel -maxdepth 2 -name "*.rej" -exec basename {} .rej \;); do
+              mapfile -t rej_files < <(find ./kernel -maxdepth 2 -name "*.rej")
+              for rej_file in "${rej_files[@]}"; do
+                [ -f "$rej_file" ] || continue
+                file=$(basename "$rej_file" .rej)
                 echo "Patching file: $file with fix_$file.patch"
+                rm -f "$rej_file"
                 patch -p1 --forward < "$KERNEL_PATCHES_FOLDER/next/susfs_fix_patches/$susfs_version/fix_$file.patch"
               done
               echo "Patching Hook Mode!"
@@ -1095,8 +1107,12 @@ runs:
             if [ "${{ inputs.ksu_type }}" = "KSUN" ]; then
               cd "$KSUN_FOLDER"
               patch -p1 --forward < "$SUSFS_FOLDER/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" || true
-              for file in $(find ./kernel -maxdepth 2 -name "*.rej" -exec basename {} .rej \;); do
+              mapfile -t rej_files < <(find ./kernel -maxdepth 2 -name "*.rej")
+              for rej_file in "${rej_files[@]}"; do
+                [ -f "$rej_file" ] || continue
+                file=$(basename "$rej_file" .rej)
                 echo "Patching file: $file with fix_$file.patch"
+                rm -f "$rej_file"
                 patch -p1 --forward < "$KERNEL_PATCHES_FOLDER/next/susfs_fix_patches/$susfs_version/fix_$file.patch"
               done
               echo "Patching Hook Mode!"
