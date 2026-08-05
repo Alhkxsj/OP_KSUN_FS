@@ -318,7 +318,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        sudo apt-get update && sudo apt-get install -y libelf-dev
+        sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libelf-dev libdwarf-dev dwarves binutils-dev build-essential bc bison flex pkg-config
         CONFIG="$OP_MODEL"
         echo "Creating folder for configuration: $CONFIG"
         mkdir -p "$CONFIG"
@@ -1220,6 +1220,32 @@ runs:
             fi
           fi
         fi
+        
+        # Verify no patch rejects (.rej) exist
+        rej_count=0
+        for dir in "$COMMON_KERNEL_FOLDER" "${KSUN_FOLDER:-}" "${KSU_FOLDER:-}"; do
+          if [ -n "$dir" ] && [ -d "$dir" ]; then
+            if find "$dir" -name "*.rej" -print | grep -q .; then
+              echo "::error::SUSFS patches did not apply cleanly in $dir! Found .rej files:"
+              find "$dir" -name "*.rej" -exec echo "REJECT: {}" \;
+              
+              # Copy rejects to a folder for artifact upload
+              mkdir -p "$GITHUB_WORKSPACE/patch_rejects"
+              find "$dir" -name "*.rej" | while read -r rej_file; do
+                rel_path="${rej_file#$GITHUB_WORKSPACE/}"
+                dest_dir="$GITHUB_WORKSPACE/patch_rejects/$(dirname "$rel_path")"
+                mkdir -p "$dest_dir"
+                cp "$rej_file" "$dest_dir/"
+              done
+              
+              rej_count=$((rej_count + 1))
+            fi
+          fi
+        done
+        if [ "$rej_count" -gt 0 ]; then
+          exit 1
+        fi
+        
         echo "✅ SUSFS patches applied"
         
         echo "Add SUSFS Configuration Settings"
@@ -2427,6 +2453,15 @@ runs:
           echo "| **Artifact Name** | \`${{ env.ZIP_NAME }}\` |"
           echo "| **AnyKernel3 SHA256** | \`${{ steps.create_zip.outputs.zip_sha256 }}\` |"
         } >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload patch rejects
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ env.OP_MODEL }}_${{ env.OP_OS_VERSION }}_patch_rejects
+        path: ${{ github.workspace }}/patch_rejects/
+        if-no-files-found: ignore
+        retention-days: 7
 
     - name: Upload Debug Artifacts
       if: ${{ always() && !cancelled() && inputs.debug == 'true' }}
