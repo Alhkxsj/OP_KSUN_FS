@@ -18,3 +18,5 @@
 🚀 Updated KSUN to 33227
 🚀 Updated SUSFS to latest commits
 🚀 7a5c415 (fix(ci): solve Argument list too long error on matrix generation jq calls)
+🚀 fix(action): remove original .rej files during patch-fix loop to prevent false verification check failures
+🚀 fix(ci/action): add libdw-dev package dependency to fix gendwarfksyms build errors on Kernel 6.12
