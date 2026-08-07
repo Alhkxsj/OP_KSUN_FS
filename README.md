@@ -59,10 +59,10 @@ This repository provides a fully automated GitHub Actions workflow that builds c
 - 🔋 Integrates a comprehensive **Battery Optimization Suite**
 - 🚀 Applies a curated set of performance & optimization patches
 - 📦 Builds and packages a flashable **AnyKernel3 ZIP**
-- 📱 Targets **OxygenOS 15 / android12-5.10** — three kernel variants, each matching an official OOS build:
-  - `5.10.209` → OOS 15.0.0.700
-  - `5.10.226` → OOS 15.0.0.1301
-  - `5.10.236` → OOS 15.0.0.1600
+- 📱 Targets **OxygenOS 15 / android12-5.10** — three kernel variants, each built from an official OOS source and usable across a range of OOS versions:
+  - `5.10.209` → OOS 15.0.0.700 ~ 15.0.0.1300
+  - `5.10.226` → OOS 15.0.0.1301 ~ 15.0.0.1599
+  - `5.10.236` → OOS 15.0.0.1600 and newer
 - 🔄 **Fully Synchronized Workflow**: Automatic dependency resolution via GitHub GraphQL and GitLab APIs.
 
 <br>
@@ -114,7 +114,7 @@ This repository provides a fully automated GitHub Actions workflow that builds c
 
 | Device | SoC | OOS | Kernel | Official OOS build |
 |--------|-----|-----|--------|-------------------|
-| **OnePlus Ace Racing** | Dimensity 8100 (MT6895) | OOS15 | `android12-5.10` | 15.0.0.700 (5.10.209) / 15.0.0.1301 (5.10.226) / 15.0.0.1600 (5.10.236) |
+| **OnePlus Ace Racing** | Dimensity 8100 (MT6895) | OOS15 | `android12-5.10` | 15.0.0.700~1300 (5.10.209) / 15.0.0.1301~1599 (5.10.226) / 15.0.0.1600+ (5.10.236) |
 
 Device config is located in [`configs/a15/OP-ACE-RACE.json`](./configs/a15/OP-ACE-RACE.json).
 

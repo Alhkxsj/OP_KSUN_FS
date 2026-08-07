@@ -1,29 +1,29 @@
 # MAINTENANCE
 
-本仓库的维护手册。克隆下来的人、或者接手维护的 AI，先读这一份。
+Maintenance guide for this repo. Read this before touching anything — humans and AI alike.
 
-## 这个仓库是什么
+## What this repo is
 
-- 上游链条：`WildKernels/OnePlus_KernelSU_SUSFS`（原版）→ `sakfi/OP_KSUN_FS`（魔改）→ 本仓库（fork）
-- 只构建一个机型：**OnePlus Ace Racing（一加 Ace 竞速版，天玑 8100-MAX / MT6895）**
-- 系统：OxygenOS 15（Android 15），内核分支 `android12-5.10`
-- 产物：AnyKernel3 刷机 zip，命名 `SKF_<MODEL>_<OS>_<KERNEL>_<KSU_TYPE>_<KSUVER>[_SuSFS_<SUSVER>].zip`
+- Upstream chain: `WildKernels/OnePlus_KernelSU_SUSFS` (original) → `sakfi/OP_KSUN_FS` (modified) → this repo (fork)
+- Builds one device only: **OnePlus Ace Racing (Dimensity 8100-MAX / MT6895)**
+- OS: OxygenOS 15 (Android 15), kernel branch `android12-5.10`
+- Output: AnyKernel3 flashable zips, named `SKF_<MODEL>_<OS>_<KERNEL>_<KSU_TYPE>_<KSUVER>[_SuSFS_<SUSVER>].zip`
 
-## 三个内核变体
+## Kernel variants
 
-每个变体对应一个官方 OOS 版本（PGZ110 = Ace 竞速版型号），配置在 `configs/a15/OP-ACE-RACE*.json`：
+Each variant is built from an official OOS kernel source (PGZ110 = Ace Racing model) and works across a **range** of OOS versions, not a single one. Configs live in `configs/a15/OP-ACE-RACE*.json`:
 
-| 内核版本 | 官方 OOS 版本 | 官方 commit | 日期 |
-|---|---|---|---|
-| 5.10.209 | 15.0.0.700 | 7a64b08a | 2025-04-11 |
-| 5.10.226 | 15.0.0.1301 | 6409af87 | 2025-11-10 |
-| 5.10.236（基础版） | 15.0.0.1600 | 05dd76e8 | 2026-05-16 |
+| Kernel | OOS range | Source OOS | Commit | Date |
+|---|---|---|---|---|
+| 5.10.209 | 15.0.0.700 ~ 15.0.0.1300 | 15.0.0.700 | 7a64b08a | 2025-04-11 |
+| 5.10.226 | 15.0.0.1301 ~ 15.0.0.1599 | 15.0.0.1301 | 6409af87 | 2025-11-10 |
+| 5.10.236 (base) | 15.0.0.1600 and newer | 15.0.0.1600 | 05dd76e8 | 2026-05-16 |
 
-基础版 manifest 跟随官方分支 `oneplus/mt6895_v_15.0.0_ace_race` 的 HEAD，另外两个变体锁定固定 commit。官方更新后基础版会自动带上新版本，变体不会。
+Pick the kernel matching the phone's current OOS version. The base variant's manifest follows the official branch `oneplus/mt6895_v_15.0.0_ace_race` HEAD; the other two pin fixed commits. When OnePlus updates the branch, the base variant picks it up automatically, the pinned ones don't.
 
-## 日常维护
+## Daily maintenance
 
-### 构建 + 发布
+### Build + release (one command)
 
 ```bash
 gh workflow run build-kernel-release.yml \
@@ -35,55 +35,55 @@ gh workflow run build-kernel-release.yml \
   -f sync_toolchains=false
 ```
 
-流程：`set-op-model`（生成矩阵）→ `build-A15`（三个变体并行编译，约 2-3 小时）→ `trigger-release`（自动打 tag `v2.2.0-rN` 递增，创建 **Draft** release）。
+Flow: `set-op-model` (matrix) → `build-A15` (three variants in parallel, ~2-3h) → `trigger-release` (auto tag `v2.2.0-rN`, creates a **Draft** release).
 
-发布：去 Releases 页面点 **Publish release**，或：
+Publish from the Releases page, or:
 
 ```bash
 gh release edit v2.2.0-r1 --draft=false
 ```
 
-发布后 `telegram-on-release` 自动发通知（secrets 配齐才发）。
+`telegram-on-release` notifies automatically after publish (only if secrets are set).
 
-### 工具链镜像（可选，加速构建）
+### Toolchain mirror (optional, speeds up builds)
 
 ```bash
 gh workflow run mirror-toolchains.yml
 ```
 
-把 clang/rust/build-tools/AnyKernel3 下载到 `toolchain-cache` release。构建时 `kernel-source-sync` 优先从这里拉，**没有缓存会直接失败**（见下方坑 2），所以换新机型/新 manifest 前先跑一次。
+Downloads clang/rust/build-tools/AnyKernel3 into the `toolchain-cache` release. `kernel-source-sync` pulls from here during builds; **without the cache the build fails** (see pitfall 2). Run this before building a new device or manifest.
 
-### 缓存预热（自动）
+### Cache warming (automatic)
 
-`cache-warmer.yml` 每天 0 点自动跑，只预热本机型（`configs/a15/OP-ACE-RACE.json`），ccache 存到 `ccache-cache` release。
+`cache-warmer.yml` runs daily at 00:00, warms only this device (`configs/a15/OP-ACE-RACE.json`), stores ccache in the `ccache-cache` release.
 
-## 仓库结构
+## Repo layout
 
-- `.github/workflows/` 8 个 workflow：`build-kernel-release`（核心构建）、`mirror-toolchains`（工具链镜像）、`cache-warmer`（预热）、`check-new-devices`、`check-susfs-update`、`clean-up`、`oplus-kernel-monitor`（每 12h 扫官方仓库）、`telegram-on-release`
-- `.github/actions/`：`build-kernel`（2540 行，构建核心）、`cache/restore`、`cache/save`、`kernel-source-sync`、`disk-cleanup`
-- `configs/a14|a15|a16/`：机型配置 JSON（本仓库只用 a15 的 OP-ACE-RACE）
-- `manifests/a14|a15|a16/`：OnePlus 源码 manifest XML
+- `.github/workflows/` — 8 workflows: `build-kernel-release` (core build), `mirror-toolchains`, `cache-warmer`, `check-new-devices`, `check-susfs-update`, `clean-up`, `oplus-kernel-monitor` (scans official repos every 12h), `telegram-on-release`
+- `.github/actions/` — `build-kernel` (2540 lines, build core), `cache/restore`, `cache/save`, `kernel-source-sync`, `disk-cleanup`
+- `configs/a14|a15|a16/` — device config JSONs (this repo only uses a15 OP-ACE-RACE)
+- `manifests/a14|a15|a16/` — OnePlus source manifest XMLs
 
-## 已知的坑（改代码前必读）
+## Known pitfalls (read before changing code)
 
-1. **git tag ≠ GitHub release**。两个地方踩过：`mirror-toolchains.yml` 的 `prepare-release` 和 `cache/save/action.yml` 原来只查 tag 不查 release，导致"tag 在、release 不在"时上传永远失败。已修复为 tag 和 release 独立检查。**以后写类似逻辑别只查 tag。**
-2. **`kernel-source-sync` 没有回退**：工具链必须存在于 `toolchain-cache` release（`{label}-{rev}.tar.gz`，>2GB 分片 `.partaa` 起），否则构建直接 FATAL。
-3. **MTK 机型跳过 AK3 版本检查**：`build-kernel/action.yml` 里 `do.check_boot_version=1` 只对非 `wild/mt*` 分支开启。天玑 boot 分区带厂商 header + lz4 内核，读不到版本字符串，强制检查会 abort。**不要把这个判断去掉。**
-4. **release 资产只传 `SKF_*.zip`**：`merge-multiple` 会把 `ccache-binary.zip` 等 artifact 一起拉下来，上传时必须过滤（已修，别改回去）。
-5. **Draft release 按 tag 查 API 返回 404**，用 `gh release view`。
-6. **release notes 的标题锚点不能改**：`## Features`、`### This Release`、`### Previous Releases` 被 `telegram-on-release.yml` 的 awk 解析依赖。
-7. 首次构建 ccache 归档只有几十 KB 是正常的（缓存为空），不影响构建成功。
+1. **git tag ≠ GitHub release.** Two places hit this: `mirror-toolchains.yml` `prepare-release` and `cache/save/action.yml` only checked the tag, not the release, so uploads failed forever when a tag existed without a release. Fixed by checking tag and release independently. Don't write tag-only checks.
+2. **`kernel-source-sync` has no fallback**: toolchains must exist in the `toolchain-cache` release (`{label}-{rev}.tar.gz`, >2GB split into `.partaa`+), otherwise the build fails with FATAL.
+3. **MTK devices skip the AK3 version check**: `do.check_boot_version=1` is only set for non-`wild/mt*` branches in `build-kernel/action.yml`. Dimensity boot partitions have a vendor header + lz4 kernel, the version string can't be read, and the check aborts. **Don't remove this condition.**
+4. **Only upload `SKF_*.zip` to releases**: `merge-multiple` pulls in other artifacts (e.g. `ccache-binary.zip`); the upload step must filter. Already fixed, don't revert.
+5. **Draft releases return 404 via the tag API**; use `gh release view`.
+6. **Don't change the release notes anchors**: `## Features`, `### This Release`, `### Previous Releases` are parsed by `telegram-on-release.yml` awk.
+7. A first-build ccache archive of a few dozen KB is normal (empty cache), it doesn't affect the build.
 
-## 给 AI 维护者的提示
+## Notes for AI maintainers
 
-- 改 workflow 前先读上面的"已知坑"，本仓库踩过的坑别踩第二次
-- 对外内容（issue / PR / release notes / 给别人看的文字）**先给仓库主人过目再提交**
-- 用户对 AI 味文字敏感：不要空泛形容词（comprehensive/robust）、不要填充过渡词（moreover/furthermore）、不要营销腔，用具体事实
-- 上游 `sakfi/OP_KSUN_FS` 的 issue #56 是 MTK 刷机 bug 报告，上游还没修，改动时注意保持兼容
-- 官方（OnePlusOSS）对 mt6895 内核源码的更新已停滞（2026-06 后无更新），但上游 WildKernels 还在活跃，同步上游时留意
+- Read the pitfalls above before touching workflows; don't repeat mistakes this repo already made.
+- Anything user-facing (issue / PR / release notes / text for others) must be reviewed by the repo owner before submitting.
+- The owner is sensitive to AI-flavored text: no filler adjectives (comprehensive/robust), no transition padding (moreover/furthermore), no marketing tone. State facts.
+- Upstream `sakfi/OP_KSUN_FS` issue #56 reports the MTK flash bug; upstream hasn't fixed it yet. Keep compatibility in mind.
+- Official (OnePlusOSS) mt6895 kernel updates have stalled (nothing since 2026-06), but upstream WildKernels is still active; watch it when syncing.
 
-## 上游跟踪
+## Upstream tracking
 
-- 官方内核：`OnePlusOSS/android_kernel_5.10_oneplus_mt6895`（2026-06 后停滞）
-- 上游活跃仓库：`WildKernels/OnePlus_KernelSU_SUSFS`（持续加新机型）
-- `oplus-kernel-monitor` 每 12h 自动扫描官方仓库，有变化自动开 issue
+- Official kernel: `OnePlusOSS/android_kernel_5.10_oneplus_mt6895` (stalled since 2026-06)
+- Active upstream: `WildKernels/OnePlus_KernelSU_SUSFS` (keeps adding devices)
+- `oplus-kernel-monitor` scans official repos every 12h and opens issues on changes
