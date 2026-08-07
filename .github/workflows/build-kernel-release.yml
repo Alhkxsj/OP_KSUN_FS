@@ -1108,7 +1108,7 @@ jobs:
             JSON_BUILD_DATA="[]"
           fi
           
-          for file in $(find downloaded-artifacts -maxdepth 1 -name "*.zip" -type f | sort); do
+          for file in $(find downloaded-artifacts -maxdepth 1 -name "SKF_*.zip" -type f | sort); do
             if [ -f "$file" ]; then
               zipname=$(basename "$file" .zip)
               rest="${zipname#SKF_}"
@@ -1318,7 +1318,7 @@ jobs:
 
       - name: 📤 Upload Release Assets Dynamically
         run: |
-          for file in ./downloaded-artifacts/*.zip; do
+          for file in ./downloaded-artifacts/SKF_*.zip; do
             if [ -f "$file" ]; then
               echo "Uploading $file..."
               gh release upload "${{ env.NEW_TAG }}" "$file" --clobber
@@ -1339,12 +1339,12 @@ jobs:
           
           **Draft URL:** [Edit Release](${{ github.server_url }}/${{ github.repository }}/releases/edit/${{ env.NEW_TAG }})  
           **Tag:** [\`${{ env.NEW_TAG }}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.NEW_TAG }})  
-          **Kernels:** $(find ./downloaded-artifacts -maxdepth 1 -name "*.zip" -type f | wc -l)
+          **Kernels:** $(find ./downloaded-artifacts -maxdepth 1 -name "SKF_*.zip" -type f | wc -l)
           
           ### 📦 Assets
           EOF
           
-          for zip in ./downloaded-artifacts/*.zip; do
+          for zip in ./downloaded-artifacts/SKF_*.zip; do
             if [ -f "$zip" ]; then
               name=$(basename "$zip")
               size=$(stat -c%s "$zip")
