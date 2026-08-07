@@ -60,11 +60,16 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
           if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Tag not found. Creating backdated tag and release..."
-            
+            echo "Tag not found. Creating backdated tag..."
             GIT_COMMITTER_DATE="2015-01-01T12:00:00" git tag -a "$TAG_NAME" -m "Internal Toolchains Cache"
             git push origin "$TAG_NAME"
-            
+          else
+            echo "Tag 'toolchain-cache' already exists. Skipping tag creation."
+          fi
+          
+          # The release can be missing even when the tag exists (e.g. it was
+          # deleted or creation failed once), so check them independently.
+          if ! gh release view "$TAG_NAME" --repo "$TARGET_REPO" >/dev/null 2>&1; then
             echo "Release not found. Creating..."
             gh release create "$TAG_NAME" --title "SakFi Toolchains Mirror Cache" --notes "Dedicated Toolchains for SakFi Kernel Builds" --repo "$TARGET_REPO" --prerelease
           else
