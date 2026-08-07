@@ -38,7 +38,7 @@ jobs:
           echo "susfs_hash_android16_6_12=d20fb81b5f17e66ffeac1321a1257d53e2d16e53" >> $GITHUB_OUTPUT
 
           echo "[" > matrix.json
-          mapfile -t all_json_files < <(find configs/ -name "*.json" -print0 | xargs -0 -n1)
+          mapfile -t all_json_files < <(find configs/a15 -name "OP-ACE-RACE.json" -print0 | xargs -0 -n1)
           for i in "${!all_json_files[@]}"; do
             file="${all_json_files[$i]}"
             if [ -f "$file" ]; then

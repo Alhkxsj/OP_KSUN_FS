@@ -61,10 +61,10 @@ jobs:
           if [ -z "$SUSFS_VER" ]; then SUSFS_VER="latest"; fi
 
           # ── Extract Features from the release body ──
-          # The release body has a "✨ Features & Capabilities" table with rows like:
-          # | 🔐 **KernelSU-Next** | Next-generation kernel-level root solution |
+          # The release body has a "Features" table with rows like:
+          # | KernelSU-Next | Kernel-level root |
           FEATURES_RAW=$(echo "$REL_BODY" | awk '
-            /^## ✨ Features/ { flag=1; next }
+            /^## Features/ { flag=1; next }
             flag && /^\|:---/ { next }
             flag && /^\| .+\|/ {
               # Strip leading/trailing pipes and whitespace

@@ -1156,31 +1156,15 @@ jobs:
           fi
 
           cat << EOF > release_notes.md
-          <div align="center">
-            <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=20&duration=3000&pause=1000&color=00FF99&center=true&vCenter=true&width=600&lines=KernelSU-Next+%2B+SUSFS+Release;Built+for+OnePlus+GKI+devices;Version+${{ env.NEW_TAG }};Maintained+by+sakfi" alt="Typing SVG" />
-          </div>
+          # OnePlus Kernel Build · ${{ env.NEW_TAG }}
           
-          <div align="center">
-          
-          # 🔥 OnePlus Kernels Release 🔥
-          
-          [![Release](https://img.shields.io/badge/release-${{ env.NEW_TAG }}-blue?style=flat-square)](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.NEW_TAG }})
-          [![Downloads](https://img.shields.io/github/downloads/${{ github.repository }}/${{ env.NEW_TAG }}/total?style=flat-square&color=green&label=downloads)](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.NEW_TAG }})
-          [![Workflow](https://img.shields.io/badge/Workflow-Build--Kernel-orange?style=flat-square)](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          
-          <br>
-          
-          > **📅 Build Date:** $(date -u '+%A, %d %B %Y') | **🆔 Build ID:** \`${{ github.run_id }}\`
-          
-          </div>
+          **Build ID:** \`${{ github.run_id }}\` · **Date:** $(date -u '+%Y-%m-%d %H:%M UTC') · [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           
           ---
           
-          <div align="center">
+          ## Devices (${#device_info[@]})
           
-          ### 📦 Built Devices (${#device_info[@]} total)
-          
-          | Model | OS Version | Kernel Version | Features |
+          | Model | OS | Kernel | Features |
           | :--- | :--- | :--- | :--- |
           EOF
           
@@ -1232,25 +1216,37 @@ jobs:
           
           cat << EOF >> release_notes.md
           
-          </div>
+          ---
+          
+          ## Features
+          
+          | Feature | Description |
+          |:---|:---|
+          | KernelSU-Next | Kernel-level root |
+          | SUSFS | Root hiding with magic mount |
+          | BBRv3 | TCP congestion control |
+          | BBG | LSM baseband guard |
+          | TTL / IP_SET | Network packet tools |
+          | NTSync | NT sync primitives for emulation |
+          | Droidspaces | SYSVIPC multi-instance environments |
+          | Battery suite | Wakelock caps, schedutil tuning, MGLRU |
+          | LTO | Thin/full link-time optimization |
           
           ---
           
-          <details>
-          <summary><b>🔧 View Build Configuration</b></summary>
+          ## Build Config
           
-          | Component | Version/Setting |
-          |-----------|----------------|
-          | **KernelSU Next Branch** | \`${ksu_ref} (${ksu_resolved_hash:0:7})\` |
-          | **KernelSU Next Version** | \`$ksu_ver_global\` |
-          | **SUSFS Version** | \`$SUSFS_BASE_VERSION\` |
-          | **Optimization Level** | \`$OPTIMIZE_LEVEL\` |
-          | **Clean Build** | $( [ "$CLEAN_BUILD" = "true" ] && echo "✅ Yes" || echo "❌ No" ) |
+          | Component | Setting |
+          |-----------|---------|
+          | KernelSU-Next | \`${ksu_ref} (${ksu_resolved_hash:0:7})\`, v$ksu_ver_global |
+          | SUSFS | $SUSFS_BASE_VERSION |
+          | Optimization | $OPTIMIZE_LEVEL |
+          | Clean build | $( [ "$CLEAN_BUILD" = "true" ] && echo "Yes" || echo "No" ) |
           
-          ### 📌 SUSFS Branch Mapping
+          ### SUSFS Commits
           
-          | Kernel Version | SUSFS Commit |
-          |----------------|--------------|
+          | Kernel | Commit |
+          |--------|--------|
           EOF
           
           for key in "${active_gki_keys[@]}"; do
@@ -1258,79 +1254,20 @@ jobs:
           done
           
           cat << 'EOF' >> release_notes.md
-          </details>
           
           ---
           
-          ## ✨ Features & Capabilities
+          ## Flash
           
-          | 🏷️ Feature | 📝 Description |
-          |:---|:---|
-          | 🔐 **KernelSU-Next** | Next-generation kernel-level root solution |
-          | 🥷 **SUSFS** | Advanced root hiding with Magic Mount support |
-          | 💻 **Droidspaces** | SYSVIPC support for multi-instance app environments |
-          | 🔃 **NTSync** | Fast wine synchronization primitives for emulation |
-          | 🛠️ **Manual Hooks** | \`scope_min_manual_hooks_v1.4\` for better app compatibility |
-          | 🖧 **BBRv3** | Next-gen TCP congestion control |
-          | 🛡️ **BBG** | LSM-based Baseband Guard security |
-          | 🌐 **TTL Target Support** | Network packet manipulation |
-          | 🧱 **IP Set Support** | Advanced firewall capabilities |
-          | 🏗️ **HMBIRD SCX** | Scheduler extensions for SM8750 devices |
-          | ✅ **LTO** | Link Time Optimization |
-          | ⚡️ **TMPFS XATTR** | Extended attributes for Mountify support |
-          | 🚀 **Optimization** | Memory, I/O, CPU scheduler, network tuning patches |
-          | 🔋 **Battery** | Multi-patch suite for power efficiency and wakelock reduction |
-          | 🛂 **WireGuard** | Fast, modern, and secure kernel-level VPN |
+          Requires an unlocked bootloader. Backup the current boot image before flashing.
           
-          <br>
-          
-          <details>
-          <summary><b>👀 View SUSFS Hide Capabilities</b></summary>
-          
-          - ✅ SUS_PATH · SUS_MOUNT · SUS_KSTAT · SUS_MAP
-          - ✅ SPOOF_UNAME · SPOOF_CMDLINE · OPEN_REDIRECT · AVC_SPOOF
-          </details>
+          1. Flash the zip with [Kernel Flasher](https://github.com/fatalcoder524/KernelFlasher).
+          2. Reboot, then install [KernelSU-Next Manager](https://github.com/KernelSU-Next/KernelSU-Next/releases).
+          3. Install the SUSFS module from within the manager ([sidex15/ksu_module_susfs](https://github.com/sidex15/ksu_module_susfs/releases)).
           
           ---
           
-          ## 📱 Manager Applications
-          
-          ### Official Manager
-          - **KernelSU Next Manager**  
-            → [GitHub](https://github.com/KernelSU-Next/KernelSU-Next)
-          
-          ### SusFS Module
-          - **KSU SUSFS Module** (Required for SUSFS features)  
-            → [GitHub Release](https://github.com/sidex15/ksu_module_susfs/releases)
-          
-          ### Recommended Flasher
-          - **Kernel Flasher** (Recommended for flashing AnyKernel3 ZIPs, backups and OTA)  
-            → [GitHub Release](https://github.com/fatalcoder524/KernelFlasher/releases)
-          - **KSUN Built-in Flasher** (Alternative flasher)  
-            → Accessible directly within the KernelSU Next Manager app
-          
-          ---
-          
-          ## 📥 Installation Instructions
-          
-          <details>
-          <summary><b>🛠️ View Prerequisites</b></summary>
-          
-          - Unlocked bootloader.
-          - Backup your current boot image.
-          - Have root access using Magisk / KernelSU (Any forks) / Apatch.
-          </details>
-          
-          ### Via Kernel Flasher
-          1. Download the appropriate ZIP for your device from the Assets below.
-          2. Flash the ZIP file using [Kernel Flasher](https://github.com/fatalcoder524/KernelFlasher) or [Horizon Kernel Flasher](https://github.com/libxzr/HorizonKernelFlasher).
-          3. Reboot system.
-          4. Install KernelSU-Next Manager (or KernelSU Manager depending on build).
-          5. Install SUSFS module from manager.
-          
-          ---
-          
-          ## 📜 Changelog
+          ## Changelog
           
           ### This Release
           EOF
@@ -1356,45 +1293,14 @@ jobs:
             echo '```' >> release_notes.md
           fi
           
-          cat << 'EOF' >> release_notes.md
+          cat << EOF >> release_notes.md
           
           ### Previous Releases
-          See [Releases Page](https://github.com/sakfi/OP_KSUN_FS/releases)
+          See the [Releases page](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases).
           
           ---
           
-          ## 🌟 Special Thanks
-          
-          These amazing people help make this project possible! ❤️
-          
-          <div align="center">
-          
-          | 🔧 Project/Role | 👨‍💻 Developer | 🔗 Link |
-          |:---:|:---:|:---:|
-          | **Original Repository** | fatalcoder524 | [![GitHub](https://img.shields.io/badge/GitHub-fatalcoder524-blue?style=flat-square&logo=github)](https://github.com/fatalcoder524) |
-          | **KernelSU** | tiann | [![GitHub](https://img.shields.io/badge/GitHub-tiann-blue?style=flat-square&logo=github)](https://github.com/tiann/KernelSU) |
-          | **KernelSU-Next** | rifsxd | [![GitHub](https://img.shields.io/badge/GitHub-rifsxd-blue?style=flat-square&logo=github)](https://github.com/KernelSU-Next/KernelSU-Next) |
-          | **SUSFS** | simonpunk | [![GitLab](https://img.shields.io/badge/GitLab-simonpunk-orange?style=flat-square&logo=gitlab)](https://gitlab.com/simonpunk/susfs4ksu.git) |
-          | **SUSFS Module** | sidex15 | [![GitHub](https://img.shields.io/badge/GitHub-sidex15-blue?style=flat-square&logo=github)](https://github.com/sidex15) |
-          | **Optimization Patches** | backslashxx | [![GitHub](https://img.shields.io/badge/GitHub-backslashxx-blue?style=flat-square&logo=github)](https://github.com/backslashxx) |
-          | **Optimization Patches** | liqideqq (Teemo) | [![GitHub](https://img.shields.io/badge/GitHub-liqideqq-blue?style=flat-square&logo=github)](https://github.com/liqideqq) |
-          
-          </div>
-          
-          ---
-          
-          ## 💬 Support & Connect
-          
-          <div align="center">
-          
-          [![Telegram](https://img.shields.io/badge/Telegram-SakFi-blue?logo=telegram)](http://t.me/SakFi)
-          [![GitHub](https://img.shields.io/badge/GitHub-SakFi-blue?logo=github)](https://github.com/sakfi)
-          
-          <br>
-          
-          **🚀 Built with ❤️ by [sakfi](https://github.com/sakfi)**
-          
-          </div>
+          Maintained by [sakfi](https://github.com/sakfi) · Based on [WildKernels/OnePlus_KernelSU_SUSFS](https://github.com/WildKernels/OnePlus_KernelSU_SUSFS)
           EOF
           
           echo "--- Final Release Notes Created ---"
