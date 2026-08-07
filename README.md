@@ -195,7 +195,7 @@ These amazing people help make this project possible! ❤️
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/chart?repos=sakfi/OP_KSUN_FS&type=date&legend=top-left&sealed_token=P2zI1CsCyzCC28LtHa0EH7c5ty10V8zKIH5tSCDr9lD4l715sEo2KDk28OzO19Vp0FLTW1AIumRCK3DCB9EEv5xlitokIwSzRKPlKmzuBlWzOWIQZdL4Tw)](https://www.star-history.com/?repos=sakfi%2FOP_KSUN_FS&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=sakfi/OP_KSUN_FS&type=Date)](https://star-history.com/#sakfi/OP_KSUN_FS&Date)
 
 <br>
 
