@@ -143,14 +143,14 @@ jobs:
               ISSUE_BODY+="| **Kernel branch** | \`$BRANCH\` |\n"
               ISSUE_BODY+="| **Recommended optimize** | \`$RECOMMENDED_OPT\` (based on SoC family) |\n"
               ISSUE_BODY+="| **Recommended LTO** | \`$RECOMMENDED_LTO\` |\n\n"
-              ISSUE_BODY+="<details><summary>📄 Suggested config (with SakFi improvements)</summary>\n\n"
+              ISSUE_BODY+="<details><summary>📄 Suggested config (with Alhkxsj improvements)</summary>\n\n"
               ISSUE_BODY+="\`\`\`json\n"
 
-              # Build suggested config with SakFi improvements applied
+              # Build suggested config with Alhkxsj improvements applied
               SUGGESTED=$(echo "$CONFIG_JSON" | jq \
                 --arg opt "$RECOMMENDED_OPT" \
                 --arg lto "$RECOMMENDED_LTO" \
-                --arg uname "SakFi-OP" \
+                --arg uname "Alhkxsj-OP" \
                 '. + {optimize: $opt, lto: $lto, uname: $uname}')
 
               ISSUE_BODY+="$SUGGESTED"

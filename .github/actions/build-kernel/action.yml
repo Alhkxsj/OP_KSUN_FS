@@ -2264,9 +2264,9 @@ runs:
         
         cp "$IMAGE_PATH" "$AK3_FOLDER/Image"
 
-        # Re-apply SakFi Branding (Banner and Flash Output)
+        # Re-apply custom branding (Banner and Flash Output)
         if [ -f "${GITHUB_WORKSPACE}/.github/workflows/custom_banner.txt" ]; then
-          echo "✅ Injecting custom SakFi cinematic banner..."
+          echo "✅ Injecting custom cinematic banner..."
           BANNER_FILE="${GITHUB_WORKSPACE}/.github/workflows/custom_banner.txt"
           
           cd "$AK3_FOLDER"
@@ -2276,7 +2276,7 @@ runs:
           sed -i '/^[[:space:]]*ui_print/d' anykernel.sh
           
           # Update kernel.string
-          sed -i 's/kernel.string=.*/kernel.string=OnePlus Kernels by SakFi/g' anykernel.sh
+          sed -i 's/kernel.string=.*/kernel.string=OnePlus Kernels by Alhkxsj/g' anykernel.sh
           
           # Remove default AnyKernel3 banner from core script to prevent duplicate banners
           if [ -f tools/ak3-core.sh ]; then

@@ -7,7 +7,7 @@
 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
 █     > SYSTEM:   O P _ K E R N E L    █
-█     > CODENAME: S A K F I            █
+█     > CODENAME: A L H K X S J          █
 █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
 sleep 1.0
 
@@ -44,7 +44,7 @@ sleep 0.6
 ui_print " "
 ui_print "----------------------------------------------"
 sleep 0.5
-ui_print "[*] Kernels for OnePlus devices by SakFi"
+ui_print "[*] Kernels for OnePlus devices by Alhkxsj"
 sleep 1.0
 ui_print "----------------------------------------------"
 sleep 0.5
@@ -71,26 +71,6 @@ sleep 0.7
 ui_print " "
 ui_print "[✓] Completed"
 sleep 1.0
-
-ui_print " "
-ui_print "[✓] SakFi Telegram Channel:"
-ui_print "    https://t.me/opksunfs"
-sleep 0.7
-
-ui_print " "
-ui_print "[✓] SakFi Telegram Group:"
-ui_print "    https://t.me/opksunfsg"
-sleep 0.7
-
-ui_print " "
-ui_print "[✓] SakFi Telegram:"
-ui_print "    https://t.me/SakFi"
-sleep 0.7
-
-ui_print " "
-ui_print "[✓] SakFi GitHub:"
-ui_print "    https://github.com/sakfi"
-sleep 0.8
 
 ui_print " "
 ui_print ">>> Enjoy your new Kernel! <<<"

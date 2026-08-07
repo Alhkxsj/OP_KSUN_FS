@@ -1,13 +1,13 @@
 <div align="center">
 
 # 🔥 OP_KSUN_FS 🔥
-[![Build Kernel](https://img.shields.io/github/actions/workflow/status/sakfi/OP_KSUN_FS/build-kernel-release.yml?label=Latest%20Release%20status&style=flat-square)](https://github.com/sakfi/OP_KSUN_FS/actions/workflows/build-kernel-release.yml)
-[![GitHub Release](https://img.shields.io/github/v/release/sakfi/OP_KSUN_FS?label=release&color=blue)](https://github.com/sakfi/OP_KSUN_FS/releases/latest)
-[![Forks](https://badgen.net/github/forks/sakfi/OP_KSUN_FS?color=orange)](https://github.com/sakfi/OP_KSUN_FS/network/members)
-[![Stars](https://badgen.net/github/stars/sakfi/OP_KSUN_FS?color=yellow)](https://github.com/sakfi/OP_KSUN_FS/stargazers)
+[![Build Kernel](https://img.shields.io/github/actions/workflow/status/Alhkxsj/OP_KSUN_FS/build-kernel-release.yml?label=Latest%20Release%20status&style=flat-square)](https://github.com/Alhkxsj/OP_KSUN_FS/actions/workflows/build-kernel-release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Alhkxsj/OP_KSUN_FS?label=release&color=blue)](https://github.com/Alhkxsj/OP_KSUN_FS/releases/latest)
+[![Forks](https://badgen.net/github/forks/Alhkxsj/OP_KSUN_FS?color=orange)](https://github.com/Alhkxsj/OP_KSUN_FS/network/members)
+[![Stars](https://badgen.net/github/stars/Alhkxsj/OP_KSUN_FS?color=yellow)](https://github.com/Alhkxsj/OP_KSUN_FS/stargazers)
 
-<a href="https://github.com/sakfi/OP_KSUN_FS">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=20&duration=3000&pause=1000&color=00FF99&center=true&vCenter=true&width=600&lines=An+Open+Source+Kernel;Integrated+With+KernelSU-Next+%2B+SUSFS;For+OnePlus+Devices;Maintained+by+SakFi" alt="Typing SVG" />
+<a href="https://github.com/Alhkxsj/OP_KSUN_FS">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=20&duration=3000&pause=1000&color=00FF99&center=true&vCenter=true&width=600&lines=An+Open+Source+Kernel;Integrated+With+KernelSU-Next+%2B+SUSFS;For+OnePlus+Devices;Maintained+by+Alhkxsj" alt="Typing SVG" />
 </a>
 
 [![KernelSU-Next](https://img.shields.io/badge/KernelSU_Next-Supported-green)](https://kernelsu-next.github.io/webpage/)
@@ -15,7 +15,7 @@
 [![KernelSU](https://img.shields.io/badge/KernelSU-Not%20Supported-cb2431)](https://kernelsu.org/)
 [![SUSFS](https://img.shields.io/badge/SUSFS-Integrated-orange?logo=gitlab)](https://gitlab.com/simonpunk/susfs4ksu)
 
-> **Forked from [WildKernels/OnePlus_KernelSU_SUSFS](https://github.com/WildKernels/OnePlus_KernelSU_SUSFS)**
+> **Forked from [sakfi/OP_KSUN_FS](https://github.com/sakfi/OP_KSUN_FS) (originally [WildKernels/OnePlus_KernelSU_SUSFS](https://github.com/WildKernels/OnePlus_KernelSU_SUSFS))**
 
 </div>
 
@@ -214,11 +214,6 @@ If you encounter any issues or need help, feel free to:
 
 <div align="center">
 
-[![Telegram](https://img.shields.io/badge/Telegram-SakFi-blue?logo=telegram)](http://t.me/SakFi)
-[![GitHub](https://img.shields.io/badge/GitHub-SakFi-blue?logo=github)](https://github.com/sakfi)
+[![GitHub](https://img.shields.io/badge/GitHub-Alhkxsj-blue?logo=github)](https://github.com/Alhkxsj)
 
 </div>
-
-<p align="center">
-  <img src="https://komarev.com/ghpvc/?username=sakfi&label=Profile%20Views&color=ff007f&style=for-the-badge" alt="sakfi" />
-</p>
