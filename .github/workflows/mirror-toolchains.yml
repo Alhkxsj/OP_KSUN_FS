@@ -222,6 +222,10 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: Install aria2 & curl
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends aria2 curl
+
       - name: Sync & Upload
         run: |
           TARGET_REPO="${{ github.repository }}"
