@@ -7,7 +7,7 @@
 [![Stars](https://badgen.net/github/stars/Alhkxsj/OP_KSUN_FS?color=yellow)](https://github.com/Alhkxsj/OP_KSUN_FS/stargazers)
 
 <a href="https://github.com/Alhkxsj/OP_KSUN_FS">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=20&duration=3000&pause=1000&color=00FF99&center=true&vCenter=true&width=600&lines=An+Open+Source+Kernel;Integrated+With+KernelSU-Next+%2B+SUSFS;For+OnePlus+Devices;Maintained+by+Alhkxsj" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=20&duration=3000&pause=1000&color=00FF99&center=true&vCenter=true&width=600&lines=Custom+Kernel+For+OnePlus+Ace+Racing;KernelSU-Next+%2B+SUSFS;OxygenOS+15+%2F+android12-5.10;Maintained+by+Alhkxsj" alt="Typing SVG" />
 </a>
 
 [![KernelSU-Next](https://img.shields.io/badge/KernelSU_Next-Supported-green)](https://kernelsu-next.github.io/webpage/)
@@ -52,14 +52,14 @@ Flashing this kernel will not void your warranty, but there is always a risk of 
 
 ## 🚀 What This Does
 
-This repository provides a fully automated GitHub Actions workflow that:
+This repository provides a fully automated GitHub Actions workflow that builds custom kernels for the **OnePlus Ace Racing (天玑 8100 / MT6895)**:
 - 📥 Clones the OnePlus GKI kernel source via `repo sync`
-- 🛡️ Integrates **KernelSU-Next (KSUN)** or **KernelSU (KSU)**
+- 🛡️ Integrates **KernelSU-Next (KSUN)**
 - ⚔️ Applies **SUSFS** patches (Dynamically updated via GitLab API)
 - 🔋 Integrates a comprehensive **Battery Optimization Suite**
 - 🚀 Applies a curated set of performance & optimization patches
 - 📦 Builds and packages a flashable **AnyKernel3 ZIP**
-- 📱 Supports all major OnePlus OxygenOS versions (OOS14, OOS15, OOS16)
+- 📱 Targets **OxygenOS 15 / android12-5.10** (kernel 5.10.209 / 5.10.226 / 5.10.236 variants)
 - 🔄 **Fully Synchronized Workflow**: Automatic dependency resolution via GitHub GraphQL and GitLab APIs.
 
 <br>
@@ -84,7 +84,6 @@ This repository provides a fully automated GitHub Actions workflow that:
 | 🧱 **IP Set Support** | Advanced firewall capabilities |
 | 🔄 **NTSync** | Universal NT synchronization primitives for gaming |
 | 🛂 **WireGuard** | Fast, modern, and secure kernel-level VPN |
-| 🏗️ **HMBIRD SCX** | Scheduler extensions for SM8750 devices |
 | ✅ **LTO** | Link Time Optimization (thin/full/none configurable) |
 | ⚡️ **TMPFS XATTR** | Extended attributes for Mountify and Meta support |
 | 🚀 **Optimization patches** | Memory, I/O, CPU scheduler, network tuning |
@@ -108,15 +107,13 @@ This repository provides a fully automated GitHub Actions workflow that:
   <img src=".github/workflows/split.gif" alt="Divider" width="100%" height="4px" />
 </div>
 
-## 📱 Supported Devices
+## 📱 Supported Device
 
-Device configs are located in [`configs/`](./configs/). Internal patches are centralized in [`configs/kernel_patches/`](./configs/kernel_patches/).
+| Device | SoC | OOS | Kernel |
+|--------|-----|-----|--------|
+| **OnePlus Ace Racing** | Dimensity 8100 (MT6895) | OOS15 | `android12-5.10` (5.10.209 / 5.10.226 / 5.10.236) |
 
-| OOS Version | Kernel | Example Devices |
-|-------------|--------|-----------------|
-| **OOS14** | `5.10` / `5.15` / `6.1` | OP10 Pro, OP11, OP12, OP-ACE series |
-| **OOS15** | `5.15` / `6.1` / `6.6` | OP12, OP13, OP13S, OP-ACE-5, OP-NORD series |
-| **OOS16** | `6.1` / `6.6` / `6.12` | OP13, OP-ACE-5 series, OP-PAD series |
+Device config is located in [`configs/a15/OP-ACE-RACE.json`](./configs/a15/OP-ACE-RACE.json).
 
 ### 🛠️ Internal Patches
 All local kernel enhancements are organized under one roof for easier maintenance:
@@ -171,7 +168,7 @@ Our unique battery suite targets three critical areas to maximize OnePlus perfor
 
 ## 🌟 Special Thanks
 
-These amazing people help make this project possible! ❤️
+Thanks to the projects this kernel builds on:
 
 <div align="center">
 
