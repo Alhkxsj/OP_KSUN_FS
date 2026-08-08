@@ -489,32 +489,39 @@ jobs:
           
           # SUSFS_VERSION — only when releasing
           if [ "${{ inputs.make_release }}" = "true" ]; then
-            susfs_base_version="unknown"
-            for key in "${active_keys[@]}"; do
-              ver="${susfs_versions_per_key[$key]:-unknown}"
-              if [ "$ver" != "unknown" ]; then
-                susfs_base_version="$ver"
-                break
-              fi
-            done
-            
-            if [ "$susfs_base_version" = "unknown" ]; then
-              echo "::error::Could not extract SUSFS_VERSION from susfs.h for any active GKI key. Cannot proceed with release."
-              exit 1
-            fi
-            
-            # make_release=true: mismatch is a hard error — prevents wrong tag
-            for key in "${active_keys[@]}"; do
-              key_ver="${susfs_versions_per_key[$key]:-unknown}"
-              if [ "$key_ver" != "$susfs_base_version" ]; then
-                echo "::error::SUSFS version mismatch: '$key' has '$key_ver', expected '$susfs_base_version'. Align refs before releasing."
+            if [ ${#active_keys[@]} -eq 0 ]; then
+              # No SUSFS-enabled devices — fallback version so release can still be tagged/created
+              susfs_base_version="v1.0.0"
+              echo "ℹ️ No SUSFS devices activated; using fallback SUSFS_BASE_VERSION=$susfs_base_version"
+              echo "susfs_base_version=$susfs_base_version" >> "$GITHUB_OUTPUT"
+            else
+              susfs_base_version="unknown"
+              for key in "${active_keys[@]}"; do
+                ver="${susfs_versions_per_key[$key]:-unknown}"
+                if [ "$ver" != "unknown" ]; then
+                  susfs_base_version="$ver"
+                  break
+                fi
+              done
+              
+              if [ "$susfs_base_version" = "unknown" ]; then
+                echo "::error::Could not extract SUSFS_VERSION from susfs.h for any active GKI key. Cannot proceed with release."
                 exit 1
               fi
-            done
-            
-            # Ensure v prefix for standardized versioning
-            [[ "$susfs_base_version" != v* ]] && susfs_base_version="v$susfs_base_version"
-            echo "susfs_base_version=$susfs_base_version" >> "$GITHUB_OUTPUT"
+              
+              # make_release=true: mismatch is a hard error — prevents wrong tag
+              for key in "${active_keys[@]}"; do
+                key_ver="${susfs_versions_per_key[$key]:-unknown}"
+                if [ "$key_ver" != "$susfs_base_version" ]; then
+                  echo "::error::SUSFS version mismatch: '$key' has '$key_ver', expected '$susfs_base_version'. Align refs before releasing."
+                  exit 1
+                fi
+              done
+              
+              # Ensure v prefix for standardized versioning
+              [[ "$susfs_base_version" != v* ]] && susfs_base_version="v$susfs_base_version"
+              echo "susfs_base_version=$susfs_base_version" >> "$GITHUB_OUTPUT"
+            fi
           fi
           
           # Inject susfs_resolved_hash into each device in the matrix
@@ -1020,12 +1027,19 @@ jobs:
       REPO_NAME: ${{ github.event.repository.name }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SUSFS_BASE_VERSION: ${{ needs.set-op-model.outputs.susfs_base_version }}
-      RELEASE_NAME: 'OnePlus Ace Racing Kernel · KernelSU-Next & SUSFS ${{ needs.set-op-model.outputs.susfs_base_version }}'
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: 🏷️ Compose release name
+        run: |
+          if [ -n "${{ needs.set-op-model.outputs.active_gki_keys }}" ]; then
+            echo "RELEASE_NAME=OnePlus Ace Racing Kernel · KernelSU-Next & SUSFS ${SUSFS_BASE_VERSION}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_NAME=OnePlus Ace Racing Kernel · KernelSU-Next ${SUSFS_BASE_VERSION}" >> "$GITHUB_ENV"
+          fi
 
       - name: 🏷️ Generate and Create New Tag
         run: |
@@ -1214,6 +1228,12 @@ jobs:
             printf "| [%s](%s) | %-10s | %-16s | %-48s |\n" "$model" "$DOWNLOAD_URL" "$os_ver_display" "$kernel_ver_display" "$features_str" >> release_notes.md
           done
           
+          if [ ${#active_gki_keys[@]} -gt 0 ]; then
+            HAS_SUSFS="true"
+          else
+            HAS_SUSFS="false"
+          fi
+          
           cat << EOF >> release_notes.md
           
           ---
@@ -1223,7 +1243,11 @@ jobs:
           | Feature | Description |
           |:---|:---|
           | KernelSU-Next | Kernel-level root |
-          | SUSFS | Root hiding with magic mount |
+          EOF
+          if [ ${#active_gki_keys[@]} -gt 0 ]; then
+            echo "| SUSFS | Root hiding with magic mount |" >> release_notes.md
+          fi
+          cat << EOF >> release_notes.md
           | BBRv3 | TCP congestion control |
           | BBG | LSM baseband guard |
           | TTL / IP_SET | Network packet tools |
@@ -1239,19 +1263,22 @@ jobs:
           | Component | Setting |
           |-----------|---------|
           | KernelSU-Next | \`${ksu_ref} (${ksu_resolved_hash:0:7})\`, v$ksu_ver_global |
-          | SUSFS | $SUSFS_BASE_VERSION |
+          EOF
+          if [ ${#active_gki_keys[@]} -gt 0 ]; then
+            echo "| SUSFS | $SUSFS_BASE_VERSION |" >> release_notes.md
+          fi
+          cat << EOF >> release_notes.md
+          
           | Optimization | $OPTIMIZE_LEVEL |
           | Clean build | $( [ "$CLEAN_BUILD" = "true" ] && echo "Yes" || echo "No" ) |
-          
-          ### SUSFS Commits
-          
-          | Kernel | Commit |
-          |--------|--------|
           EOF
           
-          for key in "${active_gki_keys[@]}"; do
-            echo "| $key | \`${susfs_map[$key]:-unknown}\` |" >> release_notes.md
-          done
+          if [ ${#active_gki_keys[@]} -gt 0 ]; then
+            printf '### SUSFS Commits\n\n| Kernel | Commit |\n|--------|--------|\n' >> release_notes.md
+            for key in "${active_gki_keys[@]}"; do
+              echo "| $key | \`${susfs_map[$key]:-unknown}\` |" >> release_notes.md
+            done
+          fi
           
           cat << 'EOF' >> release_notes.md
           
@@ -1263,7 +1290,13 @@ jobs:
           
           1. Flash the zip with [Kernel Flasher](https://github.com/fatalcoder524/KernelFlasher).
           2. Reboot, then install [KernelSU-Next Manager](https://github.com/KernelSU-Next/KernelSU-Next/releases).
-          3. Install the SUSFS module from within the manager ([sidex15/ksu_module_susfs](https://github.com/sidex15/ksu_module_susfs/releases)).
+          EOF
+          
+          if [ ${#active_gki_keys[@]} -gt 0 ]; then
+            echo "3. Install the SUSFS module from within the manager ([sidex15/ksu_module_susfs](https://github.com/sidex15/ksu_module_susfs/releases))." >> release_notes.md
+          fi
+          
+          cat << 'EOF' >> release_notes.md
           
           ---
           
