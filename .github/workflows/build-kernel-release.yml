@@ -1033,8 +1033,8 @@ jobs:
             NEW_TAG="${{ github.event.inputs.custom_release_tag }}"
             echo "✅ Using custom tag: $NEW_TAG"
           else
-            # Get the absolute latest tag from the repository
-            LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' 2>/dev/null || true)
+            # Get the latest tag matching the current SUSFS base version
+            LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '[.[].name | select(contains("'$SUSFS_BASE_VERSION'"))][0] // empty' 2>/dev/null || true)
             
             if [ -z "$LATEST_TAG" ]; then
               # No existing tags → start at -r1 for the current version
@@ -1282,7 +1282,7 @@ jobs:
             echo "${{ inputs.custom_changelog }}" >> release_notes.md
             echo '```' >> release_notes.md
           else
-            PREV_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' 2>/dev/null || true)
+            PREV_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '[.[].name | select(contains("'$SUSFS_BASE_VERSION'"))][0] // empty' 2>/dev/null || true)
             echo '```text' >> release_notes.md
             if [ -n "$PREV_TAG" ]; then
               git log "$PREV_TAG..HEAD" --oneline --pretty=format:"- %s (%h)" >> release_notes.md
