@@ -380,6 +380,18 @@ runs:
         DEBUG_ZIP_NAME="debug_${OP_MODEL}_${OP_OS_VERSION}.zip"
         echo "DEBUG_ZIP_NAME=$DEBUG_ZIP_NAME" >> "$GITHUB_ENV"
 
+    - name: Set Platform Defconfig
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ "$OP_BRANCH" == wild/mt* ]] && [ -f "$COMMON_KERNEL_FOLDER/arch/arm64/configs/mgk_64_k510_defconfig" ]; then
+          DEFCONFIG_FILE="mgk_64_k510_defconfig"
+        else
+          DEFCONFIG_FILE="gki_defconfig"
+        fi
+        echo "DEFCONFIG_FILE=$DEFCONFIG_FILE" >> "$GITHUB_ENV"
+        echo "Using defconfig: $DEFCONFIG_FILE (branch: $OP_BRANCH)"
+
     - name: Set Kernel build-tools to Path
       shell: bash
       run: |
@@ -927,7 +939,7 @@ runs:
         
         
         echo "Add KSUN Configuration Settings"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_KSU=y
         CONFIG_KSU_KPROBES_HOOK=n
         EOF
@@ -976,7 +988,7 @@ runs:
         echo "KSU_COMMIT_SHA=$KSU_COMMIT_SHA" >> $GITHUB_ENV
         
         echo "Add KSU Configuration Settings"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_KSU=y
         EOF
         
@@ -1265,7 +1277,7 @@ runs:
         echo "✅ SUSFS patches applied"
         
         echo "Add SUSFS Configuration Settings"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_KSU_SUSFS=y
         CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y
         CONFIG_KSU_SUSFS_SUS_PATH=y
@@ -1298,7 +1310,7 @@ runs:
         if ! wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash -s main; then
           echo "::warning::BBG setup script failed, continuing anyway"
         fi
-        echo "CONFIG_BBG=y" >> common/arch/arm64/configs/gki_defconfig
+        echo "CONFIG_BBG=y" >> "common/arch/arm64/configs/${DEFCONFIG_FILE}"
         sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' common/security/Kconfig
         
         case "$OP_BRANCH" in
@@ -1587,7 +1599,7 @@ runs:
         patch -p1 --forward < "$NTSYNC_PATCH"
         echo "Patching ntsync_base!"
         patch -p1 --forward < "$NTSYNC_FOLDER/ntsync_base.patch"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_NTSYNC=y
         EOF
         echo "✅ NTSync patch applied"
@@ -1615,7 +1627,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Add Tmpfs Support"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_TMPFS_XATTR=y
         CONFIG_TMPFS_POSIX_ACL=y
         EOF
@@ -1626,7 +1638,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Add BBR"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_TCP_CONG_ADVANCED=y
         CONFIG_TCP_CONG_BBR=y
         EOF
@@ -1638,7 +1650,7 @@ runs:
         set -euo pipefail
         echo "::group::Apply BBRv3 patches"
         cd "$COMMON_KERNEL_FOLDER"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_TCP_CONG_ADVANCED=y
         CONFIG_TCP_CONG_BBR3=y
         EOF
@@ -1659,7 +1671,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Enable Important Net Schedulers (qdisc)"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_NET_SCH_FQ=y
         CONFIG_NET_SCH_FQ_CODEL=y
         CONFIG_NET_SCH_CAKE=y
@@ -1673,7 +1685,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Add TTL Target Support"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_IP_NF_TARGET_TTL=y
         CONFIG_IP6_NF_TARGET_HL=y
         CONFIG_IP6_NF_MATCH_HL=y
@@ -1691,10 +1703,10 @@ runs:
         if [[ "$KERNEL_VERSION" == "6.12" ]] || [[ "$OP_BRANCH" == wild/mt* ]]; then
           echo "::debug::Skipping CONFIG_BPF_STREAM_PARSER for $KERNEL_VERSION / $OP_BRANCH"
         else
-          echo "CONFIG_BPF_STREAM_PARSER=y" >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig"
+          echo "CONFIG_BPF_STREAM_PARSER=y" >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}"
         fi
         
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_IP_SET=y
         CONFIG_IP_SET_MAX=65534
         CONFIG_IP_SET_BITMAP_IP=y
@@ -1751,7 +1763,7 @@ runs:
         echo "Patch to fix kernel panic caused by oplus_bsp_midas"
         patch -p1 --forward < "$KERNEL_PATCHES_FOLDER/common/droidspaces/0001-Return-ghost-task-if-task-is-null-and-is-requested-b.patch"
         
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_SYSVIPC=y
         CONFIG_DEVTMPFS=y
         CONFIG_PID_NS=y
@@ -1780,7 +1792,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Add Build based configs"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y
         CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3=n
         CONFIG_OPTIMIZE_INLINING=y
@@ -1794,7 +1806,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Add Build based configs"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}" <<EOF
         CONFIG_ANDROID_BINDER_IPC_RUST=m
         CONFIG_RUST=y
         EOF
@@ -1907,7 +1919,7 @@ runs:
 
         echo "Disabling following kernel modules: ${RESULT_LIST}"
         
-        echo "CONFIG_DEBLOAT_VENDOR_MODULES=${RESULT_LIST}" >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig"
+        echo "CONFIG_DEBLOAT_VENDOR_MODULES=${RESULT_LIST}" >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}"
 
         KERNEL_VERSION="${{ env.KERNEL_VER }}"
         MIN_VERSION="5.16"
@@ -2010,7 +2022,13 @@ runs:
         ccache -s | head -n 20
         echo "============================================"
         
-        make LD="$COMMON_KERNEL_FOLDER/ld-wrapper" HOSTLD="$COMMON_KERNEL_FOLDER/ld-wrapper" O="$OUT" gki_defconfig
+        make LD="$COMMON_KERNEL_FOLDER/ld-wrapper" HOSTLD="$COMMON_KERNEL_FOLDER/ld-wrapper" O="$OUT" "${DEFCONFIG_FILE}"
+        
+        if [[ "$OP_BRANCH" == wild/mt* ]]; then
+          scripts/config --file "$OUT/.config" -e MODULES -e MODULE_UNLOAD
+          scripts/config --file "$OUT/.config" -e MODVERSIONS
+          scripts/config --file "$OUT/.config" -e IKCONFIG -e IKCONFIG_PROC
+        fi
         
         LOCAL_LOCALVERSION="${CUSTOM_LOCALVERSION:--OP-WILD}"
         if [ -n "${LOCAL_LOCALVERSION:-}" ]; then
