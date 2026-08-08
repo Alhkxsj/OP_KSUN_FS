@@ -2045,6 +2045,14 @@ runs:
           scripts/config --file "$OUT/.config" -e HYBRIDSWAP -e HYBRIDSWAP_SWAPD -e HYBRIDSWAP_CORE -e HYBRIDSWAP_ZRAM -e THP_ZSMALLOC
           scripts/config --file "$OUT/.config" -e OPLUS_SCHED_MT6895 -e OPLUS_PERF_SCHEDINFO -e OPLUS_FEATURE_FRAME_BOOST
           scripts/config --file "$OUT/.config" -e HZ_250 -e CPU_FREQ_DEFAULT_GOV_SCHEDUTIL -e CPU_FREQ_GOV_SCHEDUTIL
+          scripts/config --file "$OUT/.config" -e SCHEDUTIL_USE_TL
+          scripts/config --file "$OUT/.config" -m MTK_SCHEDULER
+          scripts/config --file "$OUT/.config" -e MTK_EAS -e MTK_NEWIDLE_BALANCE -e MTK_SCHED_BIG_TASK_ROTATE
+          scripts/config --file "$OUT/.config" -e MTK_OPP_CAP_INFO -e MTK_OPP_MIN -e NONLINEAR_FREQ_CTL
+          scripts/config --file "$OUT/.config" -e OPLUS_BINDER_PRIO_SKIP -e OPLUS_BINDER_REF_OPT
+          scripts/config --file "$OUT/.config" -e CFG80211_CRDA_SUPPORT -e CFG80211_REQUIRE_SIGNED_REGDB -e CFG80211_USE_KERNEL_REGDB_KEYS -e MAC80211_RC_DEFAULT_MINSTREL -e MAC80211_RC_MINSTREL
+          scripts/config --file "$OUT/.config" -d CPU_THERMAL -d CPU_FREQ_THERMAL -d DEVFREQ_THERMAL
+          sed -i 's/^CONFIG_LOG_BUF_SHIFT=.*/CONFIG_LOG_BUF_SHIFT=16/' "$OUT/.config"
         fi
         
         LOCAL_LOCALVERSION="${CUSTOM_LOCALVERSION:--OP-WILD}"
