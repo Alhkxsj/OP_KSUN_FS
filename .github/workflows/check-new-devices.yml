@@ -63,6 +63,14 @@ jobs:
 
           while IFS= read -r upstream_path; do
             filename=$(basename "$upstream_path")
+            # Only track OP-ACE-RACE configs
+            case "$filename" in
+              OP-ACE-RACE*)
+                ;;
+              *)
+                continue
+                ;;
+            esac
             # Check if this file exists locally (in any OOS subfolder)
             LOCAL_MATCH=$(find configs/ -name "$filename" 2>/dev/null | head -n1)
             if [ -z "$LOCAL_MATCH" ]; then
