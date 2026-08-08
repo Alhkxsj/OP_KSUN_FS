@@ -1461,6 +1461,18 @@ runs:
         done
 
         ccache --set-config=extra_files_to_hash="$copied_modules"
+
+        echo "Patching module version check to allow loading vendor modules"
+        if [ -f "$GITHUB_WORKSPACE/.github/patches/force_load_modules.patch" ]; then
+          patch -p1 -F 3 --forward < "$GITHUB_WORKSPACE/.github/patches/force_load_modules.patch" || true
+          if ! grep -q "but ignore" kernel/module.c; then
+            echo "❌ force_load_modules.patch did not apply cleanly"
+            exit 1
+          fi
+          echo "✅ force-load modules patch applied"
+        else
+          echo "ℹ️  force_load_modules.patch not found, skipping"
+        fi
         
         echo "✅ Other patches applied"
         echo "::endgroup::"
