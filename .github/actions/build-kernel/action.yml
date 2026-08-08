@@ -25,7 +25,10 @@ inputs:
   build_timestamp:
     description: 'Custom kernel build timestamp shown in uname -a (e.g. "Tue Feb 10 10:01:02 UTC 2026"). Leave empty to use the current build time.'
     required: false
-    type: string
+    default: ''
+  custom_sublevel:
+    description: 'Spoof kernel SUBLEVEL in Makefile (e.g. "236") to bypass system update kernel version checks. Empty = keep real SUBLEVEL.'
+    required: false
     default: ''
   optimize_level:
     description: 'Compiler optimization level (O2 or O3)'
@@ -440,6 +443,19 @@ runs:
         PATCHLEVEL=$(grep '^PATCHLEVEL *=' Makefile | awk '{print $3}')
         SUBLEVEL=$(grep '^SUBLEVEL *=' Makefile | awk '{print $3}')
         FULL_VERSION="$VERSION.$PATCHLEVEL.$SUBLEVEL"
+        
+        # SUBLEVEL spoofing: rewrite Makefile so the built kernel reports a custom
+        # SUBLEVEL, bypassing system-update kernel version checks (e.g. A15 OTA
+        # requiring 5.10.209+ while source is older). Real SUBLEVEL kept for refs.
+        CUSTOM_SUBLEVEL="${{ inputs.custom_sublevel }}"
+        if [ -n "$CUSTOM_SUBLEVEL" ]; then
+          echo "🔧 Spoofing SUBLEVEL: $SUBLEVEL -> $CUSTOM_SUBLEVEL"
+          echo "REAL_SUBLEVEL=$SUBLEVEL" >> "$GITHUB_ENV"
+          sed -i "s/^SUBLEVEL[[:space:]]*=[[:space:]]*.*/SUBLEVEL = $CUSTOM_SUBLEVEL/" Makefile
+          SUBLEVEL="$CUSTOM_SUBLEVEL"
+          FULL_VERSION="$VERSION.$PATCHLEVEL.$SUBLEVEL"
+          echo "✅ Spoofed kernel version: $FULL_VERSION"
+        fi
         
         cd "$ARTIFACTS_FOLDER"
         echo "$ANDROID_VERSION-$FULL_VERSION" > "${OP_MODEL}_${OP_OS_VERSION}.txt"
@@ -1936,7 +1952,24 @@ runs:
         else
           patch -p1 < "$KERNEL_PATCHES_FOLDER/common/vendor_modules/0001-Support-conditional-vendor-modules-blacklisting-6.1-and-above.patch"
         fi
-        
+
+    - name: Check Patch Rejects
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "::group::Check for leftover .rej files after all patches"
+        source "$GITHUB_WORKSPACE/.github/scripts/check_rejects.sh"
+        check_rejects "$COMMON_KERNEL_FOLDER"
+        # Fail the build if any rejects remain (prevents silent broken patches)
+        if find "$COMMON_KERNEL_FOLDER" -name "*.rej" -print -quit | grep -q .; then
+          echo "::error::Patch rejects (.rej) found after patching. Aborting build."
+          mkdir -p "$GITHUB_WORKSPACE/patch_rejects"
+          find "$COMMON_KERNEL_FOLDER" -name "*.rej" -exec cp --parents {} "$GITHUB_WORKSPACE/patch_rejects/" \; 2>/dev/null || true
+          exit 1
+        fi
+        echo "✅ No patch rejects found"
+        echo "::endgroup::"
+
     - name: Build Kernel
       id: build_kernel_step
       shell: bash
@@ -1976,8 +2009,13 @@ runs:
         set -u
         
         echo '#!/bin/bash' > "$COMMON_KERNEL_FOLDER/ld-wrapper"
-        echo 'ld.lld "$@" --thinlto-jobs=$(nproc --all)' >> "$COMMON_KERNEL_FOLDER/ld-wrapper"
+        # ThinLTO incremental cache: persist LTO intermediate artifacts across
+        # workflow runs for much faster rebuilds (borrowed from Numbersf/Action-Build)
+        LDCACHE_DIR="${LDCACHE_DIR:-$COMMON_KERNEL_FOLDER/.thinlto-cache}"
+        mkdir -p "$LDCACHE_DIR"
+        echo 'ld.lld "$@" --thinlto-cache-dir="'"$LDCACHE_DIR"'" --thinlto-cache-policy=cache_size_bytes=3g --thinlto-jobs=$(nproc --all)' >> "$COMMON_KERNEL_FOLDER/ld-wrapper"
         chmod +x "$COMMON_KERNEL_FOLDER/ld-wrapper"
+        echo "📦 ThinLTO cache dir: $LDCACHE_DIR"
         
         KERNEL_BUILD_DATE=$(date -u)
         export SOURCE_DATE_EPOCH=$COMMIT_TIMESTAMP
