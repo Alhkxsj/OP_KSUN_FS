@@ -75,7 +75,7 @@ on:
           - OP-TURBO-6
           - OP-TURBO-6V
           - OP-TURBO-6X
-        default: All
+        default: OP-ACE-RACE
       android_version_filter:
         description: 'Select the Android Version to build'
         required: true
