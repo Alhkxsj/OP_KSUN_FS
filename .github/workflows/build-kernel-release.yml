@@ -144,7 +144,7 @@ on:
       make_release:
         description: 'Create a GitHub Release'
         type: boolean
-        default: false
+        default: true
       build_timestamp:
         description: 'Custom kernel build timestamp for uname -a (e.g. "Tue Feb 10 10:01:02 UTC 2026"). Leave empty for current time.'
         type: string
