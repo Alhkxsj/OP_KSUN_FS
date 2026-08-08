@@ -2041,9 +2041,9 @@ runs:
           scripts/config --file "$OUT/.config" -e CGROUP_BPF -e CGROUP_NET_PRIO -e MEMCG_SWAP -e MEMCG_KMEM
           scripts/config --file "$OUT/.config" -e ANDROID_VENDOR_HOOKS -e ANDROID_VENDOR_OEM_DATA -e SCHED_INFO -e DEBUG_KERNEL
           scripts/config --file "$OUT/.config" -e OPLUS_BALANCE_ANON_FILE_RECLAIM
-          scripts/config --file "$OUT/.config" -e OPLUS_FEATURE_MM_BOOSTPOOL -e OPLUS_FEATURE_KSWAPD_OPT -e OPLUS_FEATURE_ZRAM_OPT -e OPLUS_FEATURE_UXMEM_OPT -e OPLUS_FEATURE_MM_FEEDBACK -e OPLUS_FEATURE_MM_OSVELTE -e OPLUS_FEATURE_PERFORMANCE_MM
-          scripts/config --file "$OUT/.config" -e HYBRIDSWAP -e HYBRIDSWAP_SWAPD -e HYBRIDSWAP_CORE -e HYBRIDSWAP_ZRAM -e THP_ZSMALLOC
-          scripts/config --file "$OUT/.config" -e OPLUS_SCHED_MT6895 -e OPLUS_PERF_SCHEDINFO -e OPLUS_FEATURE_FRAME_BOOST
+          scripts/config --file "$OUT/.config" -m OPLUS_FEATURE_MM_BOOSTPOOL -m OPLUS_FEATURE_KSWAPD_OPT -m OPLUS_FEATURE_ZRAM_OPT -m OPLUS_FEATURE_UXMEM_OPT -m OPLUS_FEATURE_MM_FEEDBACK -m OPLUS_FEATURE_MM_OSVELTE -e OPLUS_FEATURE_PERFORMANCE_MM
+          scripts/config --file "$OUT/.config" -e HYBRIDSWAP -e HYBRIDSWAP_SWAPD -e HYBRIDSWAP_CORE -m HYBRIDSWAP_ZRAM -m THP_ZSMALLOC
+          scripts/config --file "$OUT/.config" -e OPLUS_SCHED_MT6895 -m OPLUS_PERF_SCHEDINFO -m OPLUS_FEATURE_FRAME_BOOST
           scripts/config --file "$OUT/.config" -e HZ_250 -e CPU_FREQ_DEFAULT_GOV_SCHEDUTIL -e CPU_FREQ_GOV_SCHEDUTIL
           scripts/config --file "$OUT/.config" -e SCHEDUTIL_USE_TL
           scripts/config --file "$OUT/.config" -m MTK_SCHEDULER
