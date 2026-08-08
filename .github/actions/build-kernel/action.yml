@@ -2037,6 +2037,9 @@ runs:
           scripts/config --file "$OUT/.config" -e CGROUP_WRITEBACK -e CGROUP_FREEZER -e CGROUP_CPUACCT
           scripts/config --file "$OUT/.config" -e CGROUP_BPF -e CGROUP_NET_PRIO -e MEMCG_SWAP -e MEMCG_KMEM
           scripts/config --file "$OUT/.config" -e ANDROID_VENDOR_HOOKS -e ANDROID_VENDOR_OEM_DATA -e SCHED_INFO -e DEBUG_KERNEL
+          scripts/config --file "$OUT/.config" -e OPLUS_BALANCE_ANON_FILE_RECLAIM
+          scripts/config --file "$OUT/.config" -e OPLUS_FEATURE_MM_BOOSTPOOL -e OPLUS_FEATURE_KSWAPD_OPT -e OPLUS_FEATURE_ZRAM_OPT -e OPLUS_FEATURE_UXMEM_OPT -e OPLUS_FEATURE_MM_FEEDBACK -e OPLUS_FEATURE_MM_OSVELTE -e OPLUS_FEATURE_PERFORMANCE_MM
+          scripts/config --file "$OUT/.config" -e HYBRIDSWAP -e HYBRIDSWAP_SWAPD -e HYBRIDSWAP_CORE -e HYBRIDSWAP_ZRAM -e THP_ZSMALLOC
         fi
         
         LOCAL_LOCALVERSION="${CUSTOM_LOCALVERSION:--OP-WILD}"
