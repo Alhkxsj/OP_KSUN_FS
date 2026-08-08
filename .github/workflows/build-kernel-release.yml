@@ -1268,7 +1268,6 @@ jobs:
             echo "| SUSFS | $SUSFS_BASE_VERSION |" >> release_notes.md
           fi
           cat << EOF >> release_notes.md
-          
           | Optimization | $OPTIMIZE_LEVEL |
           | Clean build | $( [ "$CLEAN_BUILD" = "true" ] && echo "Yes" || echo "No" ) |
           EOF
