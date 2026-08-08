@@ -1491,8 +1491,6 @@ runs:
         echo "Customize Kernel Branding"
         cd "$COMMON_KERNEL_FOLDER"
         mkdir -p out
-        CUSTOM_LOCALVERSION="-${ANDROID_VER}-${OP_UNAME}"
-        echo "CUSTOM_LOCALVERSION=$CUSTOM_LOCALVERSION" >> "$GITHUB_ENV"
 
     - name: Disable GPUEB
       shell: bash
@@ -1727,12 +1725,17 @@ runs:
           sed -i 's/^CONFIG_LOG_BUF_SHIFT=.*/CONFIG_LOG_BUF_SHIFT=16/' "$OUT/.config"
         fi
         
-        LOCAL_LOCALVERSION="${CUSTOM_LOCALVERSION:--OP-WILD}"
-        if [ -n "${LOCAL_LOCALVERSION:-}" ]; then
-          scripts/config --file "$OUT/.config" --set-str LOCALVERSION "${LOCAL_LOCALVERSION}"
-          scripts/config --file "$OUT/.config" -d LOCALVERSION_AUTO || true
-          sed -i 's/scm_version="$(scm_version --short)"/scm_version=""/' scripts/setlocalversion
-        fi
+        # Pseudo-official random suffix: mimic stock kernel version format
+        # (x.y.z-android<ver>-<digit>-o-g<14hex>) so the system kernel version
+        # check passes (custom suffixes like -OP-WILD cause boot loops).
+        RANDOM_DIGIT=$(od -An -N1 -tu1 < /dev/urandom | tr -d '[:space:]' | awk '{print $1 % 11}')
+        RANDOM_HASH=$(od -An -N7 -tx1 /dev/urandom | tr -d ' \n')
+        RANDOM_SUFFIX="${RANDOM_DIGIT}-o-g${RANDOM_HASH}"
+        echo "Pseudo-official suffix: -${ANDROID_VER}-${RANDOM_SUFFIX}"
+
+        scripts/config --file "$OUT/.config" --set-str LOCALVERSION "-${ANDROID_VER}-${RANDOM_SUFFIX}"
+        scripts/config --file "$OUT/.config" -d LOCALVERSION_AUTO || true
+        sed -i 's/scm_version="$(scm_version --short)"/scm_version=""/' scripts/setlocalversion
         
         if [ "${{ inputs.optimize_level }}" = "O3" ]; then
           scripts/config --file "$OUT/.config" -d CC_OPTIMIZE_FOR_PERFORMANCE -e CC_OPTIMIZE_FOR_PERFORMANCE_O3
