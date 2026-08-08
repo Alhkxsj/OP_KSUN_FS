@@ -1282,7 +1282,7 @@ jobs:
             echo "${{ inputs.custom_changelog }}" >> release_notes.md
             echo '```' >> release_notes.md
           else
-            PREV_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '[.[].name | select(contains("'$SUSFS_BASE_VERSION'-r"))][0] // empty' 2>/dev/null || true)
+            PREV_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '[.[].name | select(contains("'$SUSFS_BASE_VERSION'-r") and . != "'$NEW_TAG'")][0] // empty' 2>/dev/null || true)
             echo '```text' >> release_notes.md
             if [ -n "$PREV_TAG" ]; then
               git log "$PREV_TAG..HEAD" --oneline --pretty=format:"- %s (%h)" >> release_notes.md
