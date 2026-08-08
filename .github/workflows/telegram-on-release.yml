@@ -56,10 +56,6 @@ jobs:
             STATUS="Manual Notification"
           fi
 
-          # ── Extract SUSFS version from release tag (e.g. v2.2.0-r1 → v2.2.0) ──
-          SUSFS_VER=$(echo "$REL_TAG" | sed 's/-r[0-9]*$//')
-          if [ -z "$SUSFS_VER" ]; then SUSFS_VER="latest"; fi
-
           # ── Extract Features from the release body ──
           # The release body has a "Features" table with rows like:
           # | KernelSU-Next | Kernel-level root |
@@ -94,7 +90,7 @@ jobs:
 
             while IFS= read -r line; do
               case "$line" in
-                *KernelSU*|*SUSFS*)
+                *KernelSU*)
                   feat_name=$(echo "$line" | sed 's/^- [^ ]* //' | cut -d: -f1)
                   VARIANTS="${VARIANTS}    - ${feat_name}\n" ;;
                 *BBR*|*WireGuard*|*TTL*|*IP.Set*)
@@ -129,7 +125,6 @@ jobs:
             FEATURES_BLOCK="Features:
           - Variants:
               - KernelSU-Next
-              - SUSFS (${SUSFS_VER})
           - Optimized for performance and battery life (LTO, Memory, I/O)
           - Network features (TCP BBRv3, WireGuard, IP Set, TTL)
           - Advanced features (Droidspaces, NTSync, HMBIRD SCX)
@@ -150,7 +145,7 @@ jobs:
           MESSAGE=$(cat <<EOF
           <b>$EMOJI $STATUS</b>
 
-          <pre><code class="language-markdown">Kernel Name: OnePlus Kernels with KSUN & SUSFS
+          <pre><code class="language-markdown">Kernel Name: OnePlus Kernels with KSUN
           Version / Tag: $REL_TAG
           Title: $REL_NAME
           Device: Any supported OnePlus device (Check GitHub for your device)
