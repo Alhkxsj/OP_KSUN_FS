@@ -2028,6 +2028,9 @@ runs:
           scripts/config --file "$OUT/.config" -e MODULES -e MODULE_UNLOAD
           scripts/config --file "$OUT/.config" -e MODVERSIONS
           scripts/config --file "$OUT/.config" -e IKCONFIG -e IKCONFIG_PROC
+          scripts/config --file "$OUT/.config" -e CGROUPS -e CGROUP_SCHED -e CPUSETS -e MEMCG
+          scripts/config --file "$OUT/.config" -e CGROUP_WRITEBACK -e CGROUP_FREEZER -e CGROUP_CPUACCT
+          scripts/config --file "$OUT/.config" -e CGROUP_BPF -e CGROUP_NET_PRIO -e MEMCG_SWAP -e MEMCG_KMEM
         fi
         
         LOCAL_LOCALVERSION="${CUSTOM_LOCALVERSION:--OP-WILD}"
