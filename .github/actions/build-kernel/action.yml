@@ -386,6 +386,11 @@ runs:
         set -euo pipefail
         if [[ "$OP_BRANCH" == wild/mt* ]] && [ -f "$COMMON_KERNEL_FOLDER/arch/arm64/configs/mgk_64_k510_defconfig" ]; then
           DEFCONFIG_FILE="mgk_64_k510_defconfig"
+          {
+            cat "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig"
+            cat "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}"
+          } > "$COMMON_KERNEL_FOLDER/arch/arm64/configs/mgk_gki_combined_defconfig"
+          mv "$COMMON_KERNEL_FOLDER/arch/arm64/configs/mgk_gki_combined_defconfig" "$COMMON_KERNEL_FOLDER/arch/arm64/configs/${DEFCONFIG_FILE}"
         else
           DEFCONFIG_FILE="gki_defconfig"
         fi
@@ -2031,7 +2036,7 @@ runs:
           scripts/config --file "$OUT/.config" -e CGROUPS -e CGROUP_SCHED -e CPUSETS -e MEMCG
           scripts/config --file "$OUT/.config" -e CGROUP_WRITEBACK -e CGROUP_FREEZER -e CGROUP_CPUACCT
           scripts/config --file "$OUT/.config" -e CGROUP_BPF -e CGROUP_NET_PRIO -e MEMCG_SWAP -e MEMCG_KMEM
-          scripts/config --file "$OUT/.config" -e ANDROID_VENDOR_HOOKS -e ANDROID_VENDOR_OEM_DATA -e SCHED_INFO
+          scripts/config --file "$OUT/.config" -e ANDROID_VENDOR_HOOKS -e ANDROID_VENDOR_OEM_DATA -e SCHED_INFO -e DEBUG_KERNEL
         fi
         
         LOCAL_LOCALVERSION="${CUSTOM_LOCALVERSION:--OP-WILD}"
