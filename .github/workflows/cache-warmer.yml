@@ -11,11 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-      susfs_hash_android12_5_10: ${{ steps.set-matrix.outputs.susfs_hash_android12_5_10 }}
-      susfs_hash_android13_5_15: ${{ steps.set-matrix.outputs.susfs_hash_android13_5_15 }}
-      susfs_hash_android14_6_1:  ${{ steps.set-matrix.outputs.susfs_hash_android14_6_1 }}
-      susfs_hash_android15_6_6:  ${{ steps.set-matrix.outputs.susfs_hash_android15_6_6 }}
-      susfs_hash_android16_6_12: ${{ steps.set-matrix.outputs.susfs_hash_android16_6_12 }}
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v6
@@ -30,13 +25,6 @@ jobs:
         run: |
           set -euo pipefail
           
-          # Use default SUSFS hashes from build-kernel-release.yml
-          echo "susfs_hash_android12_5_10=ce2c2b2dea28c89d33f61af898cc18a93bf65ae9" >> $GITHUB_OUTPUT
-          echo "susfs_hash_android13_5_15=529919fbc9f8aee6ee70eb3a8890ef33af0a109c" >> $GITHUB_OUTPUT
-          echo "susfs_hash_android14_6_1=d1327b62e0854603cfc26e2226e0a993ec9b0656" >> $GITHUB_OUTPUT
-          echo "susfs_hash_android15_6_6=676d202ed2cc322a2f90bcb2b56bc4f6a864acb8" >> $GITHUB_OUTPUT
-          echo "susfs_hash_android16_6_12=d20fb81b5f17e66ffeac1321a1257d53e2d16e53" >> $GITHUB_OUTPUT
-
           echo "[" > matrix.json
           mapfile -t all_json_files < <(find configs/a15 -name "OP-ACE-RACE.json" -print0 | xargs -0 -n1)
           for i in "${!all_json_files[@]}"; do
@@ -97,28 +85,6 @@ jobs:
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v6
-
-      - name: 🏷️ Resolve SUSFS Hash
-        id: susfs_res
-        run: |
-          # Match the logic from the release workflow
-          ANDROID_VER="${{ matrix.android_version }}"
-          KERNEL_VER="${{ matrix.kernel_version }}"
-          
-          if [[ "$ANDROID_VER" == "android12" && "$KERNEL_VER" == "5.10" ]]; then
-            HASH="${{ needs.generate-matrix.outputs.susfs_hash_android12_5_10 }}"
-          elif [[ "$ANDROID_VER" == "android13" && "$KERNEL_VER" == "5.15" ]]; then
-            HASH="${{ needs.generate-matrix.outputs.susfs_hash_android13_5_15 }}"
-          elif [[ "$ANDROID_VER" == "android14" && "$KERNEL_VER" == "6.1" ]]; then
-            HASH="${{ needs.generate-matrix.outputs.susfs_hash_android14_6_1 }}"
-          elif [[ "$ANDROID_VER" == "android15" && "$KERNEL_VER" == "6.6" ]]; then
-            HASH="${{ needs.generate-matrix.outputs.susfs_hash_android15_6_6 }}"
-          elif [[ "$ANDROID_VER" == "android16" && "$KERNEL_VER" == "6.12" ]]; then
-            HASH="${{ needs.generate-matrix.outputs.susfs_hash_android16_6_12 }}"
-          else
-            HASH=""
-          fi
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
 
       - name: Install Minimal Dependencies
         run: |
@@ -208,6 +174,5 @@ jobs:
           op_config_json: ${{ toJson(matrix) }}
           ksu_type: "KSUN"
           ksu_branch_or_hash: "dev"
-          susfs_commit_hash_or_branch: ${{ steps.susfs_res.outputs.hash }}
           optimize_level: "O2"
           github_token: ${{ secrets.GITHUB_TOKEN }}
